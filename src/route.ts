@@ -1,5 +1,5 @@
 import { Application, Request, Response } from "express";
-import RegisterController from "./controller/RegisterController";
+import AuthController from "./controller/AuthController";
 
 export default function(app: Application) {
     app.get('/', (req: Request, res: Response) => {
@@ -8,5 +8,13 @@ export default function(app: Application) {
         })
     })
 
-    app.post('/register', (new RegisterController).register)
+    app.get('/users', (req: Request, res: Response) => {
+        res.json({
+            "first_name": "Jidul",
+            "last_name": "Islam"
+        })
+    })
+
+    app.post('/register', (new AuthController).register)
+    app.post('/login', (new AuthController).login)
 }

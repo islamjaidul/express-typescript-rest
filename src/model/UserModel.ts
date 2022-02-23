@@ -21,8 +21,10 @@ const UserSchema = new mongoose.Schema(
 
 // Used for logged in
 UserSchema.methods.comparePassword = async function(candidatePassword: string) {
+    
     const user = this as UserDocument
-    return bcrypt.compare(candidatePassword, user.password).catch((e: any) => false)
+    return bcrypt.compare(candidatePassword, user.password).catch((e: any) => e)
+    
 }
 
 UserSchema.pre("save", async function (next) {
