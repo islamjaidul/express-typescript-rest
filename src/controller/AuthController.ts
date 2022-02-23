@@ -35,9 +35,7 @@ export default class RegisterController {
                 refreshToken: (new AuthService).createRefreshToken(user as UserDocument)
             })
         } catch(error) {
-            res.sendStatus(500).json({
-                error
-            })
+            res.sendStatus(500).json({ error })
         }
     }
 }
