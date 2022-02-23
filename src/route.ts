@@ -1,5 +1,7 @@
+import Auth from "./middleware/AuthMiddleware"
 import { Application, Request, Response } from "express";
 import AuthController from "./controller/AuthController";
+import AuthMiddleware from "./middleware/AuthMiddleware";
 
 export default function(app: Application) {
     app.get('/', (req: Request, res: Response) => {
@@ -8,7 +10,7 @@ export default function(app: Application) {
         })
     })
 
-    app.get('/users', (req: Request, res: Response) => {
+    app.get('/users', (new AuthMiddleware).handle(), (req: Request, res: Response) => {
         res.json({
             "first_name": "Jidul",
             "last_name": "Islam"

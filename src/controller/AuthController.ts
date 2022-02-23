@@ -1,8 +1,9 @@
 import {Request, Response, NextFunction} from 'express'
 import UserService from '../service/UserService'
+import AuthService from '../service/AuthService'
 import UserValidator from '../validator/UserValidator'
 import * as jwt from 'jsonwebtoken'
-import 'dotenv/config'
+import { UserDocument } from '../model/UserModel'
 
 export default class RegisterController {
     public async register(req: Request, res: Response, next: NextFunction) {
@@ -24,13 +25,14 @@ export default class RegisterController {
             const user = await (new UserService).validatePassword(req.body)
         
             if (!user) {
-                return res.status(401).send("Invalid username or password");
+                return res.status(401).json({
+                    message: "Invalid username or password"
+                });
             }
             
-            const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string
-            const accessToken = jwt.sign(user, accessTokenSecret)
             res.json({
-                accessToken
+                accessToken: (new AuthService).createAccessToken(user as UserDocument),
+                refreshToken: (new AuthService).createRefreshToken(user as UserDocument)
             })
         } catch(error) {
             res.sendStatus(500).json({
