@@ -2,7 +2,6 @@ import {Request, Response, NextFunction} from 'express'
 import UserService from '../service/UserService'
 import AuthService from '../service/AuthService'
 import UserValidator from '../validator/UserValidator'
-import * as jwt from 'jsonwebtoken'
 import { UserDocument } from '../model/UserModel'
 
 export default class RegisterController {
@@ -32,10 +31,29 @@ export default class RegisterController {
             
             res.json({
                 accessToken: (new AuthService).createAccessToken(user as UserDocument),
-                refreshToken: (new AuthService).createRefreshToken(user as UserDocument)
+                refreshToken: (new AuthService).createRefreshToken(user as UserDocument),
+                expiresIn: (new AuthService).getExpiresIn()
             })
         } catch(error) {
-            res.sendStatus(500).json({ error })
+            res.status(500).json({ error })
+        }
+    }
+
+    public async token(req: Request, res: Response, next: NextFunction) {
+        try {
+            const user = await (new AuthService).getAuthUser(req.body.token as string)
+            const refreshTokenObj = await (new AuthService).checkValidRefreshToken(user as UserDocument)
+            if (!refreshTokenObj) return res.status(403).json({ message: "Invalid refresh token" })
+            const isVerified =  await (new AuthService).verifyRefreshToken(refreshTokenObj.refresh_token)
+            
+            if (!isVerified) return res.status(403).json({ message: "Invalid refresh token" })
+
+            return res.json({
+                accessToken: (new AuthService).createAccessToken(user as UserDocument),
+                expiresIn: (new AuthService).getExpiresIn()
+            })
+        } catch (error) {
+            res.status(500).json({ error })
         }
     }
 }

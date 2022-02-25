@@ -1,4 +1,3 @@
-import Auth from "./middleware/AuthMiddleware"
 import { Application, Request, Response } from "express";
 import AuthController from "./controller/AuthController";
 import AuthMiddleware from "./middleware/AuthMiddleware";
@@ -19,4 +18,5 @@ export default function(app: Application) {
 
     app.post('/register', (new AuthController).register)
     app.post('/login', (new AuthController).login)
+    app.post('/token', (new AuthController).token)
 }
