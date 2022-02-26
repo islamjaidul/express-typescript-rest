@@ -1,9 +1,11 @@
 import 'dotenv/config'
 import { omit } from "lodash"
 import jwt from "jsonwebtoken"
+import { autoInjectable } from 'tsyringe';
 import User, { UserDocument } from "../model/UserModel";
 import RefreshToken from "../model/RefreshTokenModel";
 
+@autoInjectable()
 export default class AuthService {
     public createAccessToken(user: UserDocument): string {
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string

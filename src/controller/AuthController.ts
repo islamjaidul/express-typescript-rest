@@ -1,14 +1,24 @@
-import {Request, Response, NextFunction} from 'express'
+import { autoInjectable } from 'tsyringe'
 import UserService from '../service/UserService'
 import AuthService from '../service/AuthService'
-import UserValidator from '../validator/UserValidator'
 import { UserDocument } from '../model/UserModel'
+import UserValidator from '../validator/UserValidator'
+import {Request, Response, NextFunction} from 'express'
 
+@autoInjectable()
 export default class RegisterController {
-    public async register(req: Request, res: Response, next: NextFunction) {
+    private userService: UserService
+    private authService: AuthService
+
+    public constructor(userService: UserService, authService: AuthService) {
+        this.userService = userService
+        this.authService = authService
+    }
+
+    public register = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload = await (new UserValidator(req.body)).validateAsync()
-            const user = await (new UserService).store(payload)
+            const user = await this.userService.store(payload)
             res.json(user)
         } catch (error: any) {
             if (error.isJoi == true) {
@@ -19,10 +29,10 @@ export default class RegisterController {
         }
     }
 
-    public async login(req: Request, res: Response, next: NextFunction) {
+    public login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = await (new UserService).validatePassword(req.body)
-        
+            const user = await this.userService.validatePassword(req.body)
+            
             if (!user) {
                 return res.status(401).json({
                     message: "Invalid username or password"
@@ -30,27 +40,27 @@ export default class RegisterController {
             }
             
             res.json({
-                accessToken: (new AuthService).createAccessToken(user as UserDocument),
-                refreshToken: (new AuthService).createRefreshToken(user as UserDocument),
-                expiresIn: (new AuthService).getExpiresIn()
+                accessToken: this.authService.createAccessToken(user as UserDocument),
+                refreshToken: this.authService.createRefreshToken(user as UserDocument),
+                expiresIn: this.authService.getExpiresIn()
             })
         } catch(error) {
             res.status(500).json({ error })
         }
     }
 
-    public async token(req: Request, res: Response, next: NextFunction) {
+    public token = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = await (new AuthService).getAuthUser(req.body.token as string)
-            const refreshTokenObj = await (new AuthService).checkValidRefreshToken(user as UserDocument)
+            const user = await this.authService.getAuthUser(req.body.token as string)
+            const refreshTokenObj = await this.authService.checkValidRefreshToken(user as UserDocument)
             if (!refreshTokenObj) return res.status(403).json({ message: "Invalid refresh token" })
-            const isVerified =  await (new AuthService).verifyRefreshToken(refreshTokenObj.refresh_token)
+            const isVerified =  await this.authService.verifyRefreshToken(refreshTokenObj.refresh_token)
             
             if (!isVerified) return res.status(403).json({ message: "Invalid refresh token" })
 
             return res.json({
-                accessToken: (new AuthService).createAccessToken(user as UserDocument),
-                expiresIn: (new AuthService).getExpiresIn()
+                accessToken: this.authService.createAccessToken(user as UserDocument),
+                expiresIn: this.authService.getExpiresIn()
             })
         } catch (error) {
             res.status(500).json({ error })
