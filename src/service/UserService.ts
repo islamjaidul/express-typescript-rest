@@ -1,5 +1,6 @@
 import { omit } from "lodash"
 import User, { UserDocument } from "../model/UserModel"
+
 export default class UserService {
     public async store(input: UserDocument) {
         try {
@@ -13,23 +14,22 @@ export default class UserService {
         email: UserDocument["email"]
         password: string
       }) {
-        try {
-          const user = await User.findOne({ email });
-        
-          if (!user) {
-            return false;
-          }
-        
-          const isValid = await user.comparePassword(password.toString());
-          
-          if (!isValid) {
-            return false;
-          }
-        
-          return omit(user.toJSON(), "password");
-        } catch (e: any) {
-          throw new Error(e)
-        }
-        
+            try {
+                const user = await User.findOne({ email });
+            
+                if (!user) {
+                    return false;
+                }
+            
+                const isValid = await user.comparePassword(password.toString());
+            
+                if (!isValid) {
+                    return false;
+                }
+            
+                return omit(user.toJSON(), "password");
+            } catch (e: any) {
+                throw new Error(e)          
+            }
       }
 }
