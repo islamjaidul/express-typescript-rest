@@ -7,13 +7,8 @@ import {Request, Response, NextFunction} from 'express'
 
 @autoInjectable()
 export default class RegisterController {
-    private userService: UserService
-    private authService: AuthService
 
-    public constructor(userService: UserService, authService: AuthService) {
-        this.userService = userService
-        this.authService = authService
-    }
+    public constructor(public userService: UserService, public authService: AuthService) {}
 
     public register = async (req: Request, res: Response, next: NextFunction) => {
         try {

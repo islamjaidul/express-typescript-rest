@@ -1,8 +1,6 @@
 import { omit } from "lodash"
-import { autoInjectable } from "tsyringe"
 import User, { UserDocument } from "../model/UserModel"
 
-@autoInjectable()
 export default class UserService {
     public async store(input: UserDocument) {
         try {
