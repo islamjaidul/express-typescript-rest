@@ -8,7 +8,7 @@ export default class AuthMiddleware {
             const authHeader = req.header("Authorization") as string
             const bearerToken = authHeader && authHeader.split(" ")[1] as string
             const accessToken = process.env.ACCESS_TOKEN_SECRET as string
-            
+
             if (!bearerToken) return res.status(401).json({ message: "Token is missing" })
 
             jwt.verify(bearerToken, accessToken, (error, user) => {
