@@ -14,7 +14,7 @@ export default class RegisterController {
         try {
             const payload = await (new UserValidator(req.body)).validateAsync()
             const user = await this.userService.store(payload)
-            res.json(user)
+            res.status(201).json(user)
         } catch (error: any) {
             if (error.isJoi == true) {
                 error.status = 422
