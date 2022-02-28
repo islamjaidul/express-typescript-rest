@@ -1,7 +1,7 @@
 import request from "supertest"
-import app from "../server.test"
+import app from "../../server.test"
 import assert from "assert"
-import { signJwt } from "../utils/jwt.utils"
+import { signJwt } from "../../utils/jwt.utils"
 
 const payload = {
     "first_name": "Jidul",
@@ -14,7 +14,17 @@ const payload = {
 describe("USER API", () => {
     const accessToken = signJwt(payload)
 
-    console.log(accessToken)
+    it("it should return 422 for VALIDATION ERROR of user endpoint", (done) => {
+        request(app)
+        .post("/register")
+        .expect("Content-Type", /json/)
+        .expect(422)
+        .end((err, res) => {
+            if (err) return done(err)
+            assert(typeof(res.body), "object")
+            return done()
+        })
+    })
 
     it("It should return 401 for TOKEN MISSING for user endpoint", (done) => {
         request(app)
@@ -39,7 +49,7 @@ describe("USER API", () => {
         })
     })
 
-    it("It should return 200 for CORRECT BEARER for user endpoint", (done) => {
+    it("It should return 200 for CORRECT BEARER TOKEN for user endpoint", (done) => {
         request(app)
         .get("/users")
         .set('Authorization', `Bearer ${accessToken}`)

@@ -17,8 +17,7 @@ export default class RegisterController {
             res.status(201).json(user)
         } catch (error: any) {
             if (error.isJoi == true) {
-                error.status = 422
-                res.json(error.details)
+                res.status(422).json(error.details)
             }
             next(error)
         }

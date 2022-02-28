@@ -19,3 +19,14 @@ Content-Type: application/json
     "email": "jaidul26@gmail.com",
     "password": "123456"
 }
+
+###
+
+POST http://localhost:3001/register
+Content-Type: application/json
+
+{
+    "first_name": "Jidul",
+    "last_name": 22333,
+    "email": "dddss"
+}
