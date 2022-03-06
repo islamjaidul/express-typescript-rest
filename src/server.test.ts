@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import log from './logger/index'
-import {connect} from './db/connect.test'
+import log from '@shared/logger/index'
+import {connect} from './config/database.test'
 import route from './route'
 import { app, Request, Response, NextFunction } from './bootstrap/bootstrap'
 

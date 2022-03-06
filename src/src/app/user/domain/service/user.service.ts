@@ -1,10 +1,10 @@
 import 'dotenv/config'
 import { omit } from "lodash"
 import jwt from "jsonwebtoken"
-import User, { UserDocument } from "../model/UserModel";
-import RefreshToken from "../model/RefreshTokenModel";
+import User, { UserDocument } from "@app/user/domain/model/user.model";
+import RefreshToken from "@app/user/domain/model/refresh-token.model";
 
-export default class AuthService {
+export default class UserService {
     public createAccessToken(user: UserDocument): string {
         const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string
         return jwt.sign(user, accessTokenSecret, { expiresIn: process.env.TOKEN_EXPIRES_IN as string })
@@ -45,5 +45,55 @@ export default class AuthService {
                 return resolve(true)
             })
         })
+    }
+
+    public all = async (): Promise<Array<Object>> => {
+        const userDocument = [
+            {
+                "first_name": "Jidul",
+                "last_name": "Islam",
+                "email": "jaidul26@gmail.com",
+                "password": "123456"
+            },
+            {
+                "first_name": "Sidul",
+                "last_name": "Islam",
+                "email": "rahaddiu@gmail.com",
+                "password": "123456"
+            },
+        ]
+
+        return Promise.resolve(userDocument)
+    }
+
+    public async validatePassword({email, password}: {
+        email: UserDocument["email"]
+        password: string
+      }) {
+            try {
+                const user = await User.findOne({ email });
+            
+                if (!user) {
+                    return false;
+                }
+            
+                const isValid = await user.comparePassword(password.toString());
+            
+                if (!isValid) {
+                    return false;
+                }
+            
+                return omit(user.toJSON(), "password");
+            } catch (e: any) {
+                throw new Error(e)          
+            }
+      }
+
+      public async store(input: UserDocument) {
+        try {
+            return await User.create(input)
+        } catch(error: any) {
+            throw new Error(error)
+        }
     }
 }

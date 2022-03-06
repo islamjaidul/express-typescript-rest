@@ -1,7 +1,7 @@
 import request from "supertest"
 import app from "../../server.test"
 import assert from "assert"
-import { signJwt } from "../../utils/jwt.utils"
+import { signJwt } from "@shared/utils/jwt.utils"
 
 const payload = {
     "first_name": "Jidul",
