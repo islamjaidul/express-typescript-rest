@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import log from '../logger/index'
+import log from '@shared/logger/index'
 
 function connect() {
     const dbUri = process.env.DB_URI_TEST as string

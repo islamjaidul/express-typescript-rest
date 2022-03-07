@@ -1,14 +1,13 @@
 import { autoInjectable } from 'tsyringe'
-import UserService from '../service/UserService'
-import AuthService from '../service/AuthService'
-import { UserDocument } from '../model/UserModel'
-import UserValidator from '../validator/UserValidator'
 import {Request, Response, NextFunction} from 'express'
+import UserService from '@app/user/domain/service/user.service'
+import { UserDocument } from '@app/user/domain/model/user.model'
+import UserValidator from '@app/user/http/validator/user.validator'
 
 @autoInjectable()
-export default class RegisterController {
+export default class UserController {
 
-    public constructor(public userService: UserService, public authService: AuthService) {}
+    public constructor(public userService: UserService) {}
 
     public register = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -34,9 +33,9 @@ export default class RegisterController {
             }
             
             res.json({
-                accessToken: this.authService.createAccessToken(user as UserDocument),
-                refreshToken: this.authService.createRefreshToken(user as UserDocument),
-                expiresIn: this.authService.getExpiresIn()
+                accessToken: this.userService.createAccessToken(user as UserDocument),
+                refreshToken: await this.userService.createRefreshToken(user as UserDocument),
+                expiresIn: this.userService.getExpiresIn()
             })
         } catch(error) {
             res.status(500).json({ error })
@@ -45,19 +44,23 @@ export default class RegisterController {
 
     public token = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = await this.authService.getAuthUser(req.body.token as string)
-            const refreshTokenObj = await this.authService.checkValidRefreshToken(user as UserDocument)
+            const user = await this.userService.getAuthUser(req.body.token as string)
+            const refreshTokenObj = await this.userService.checkValidRefreshToken(user as UserDocument)
             if (!refreshTokenObj) return res.status(403).json({ message: "Invalid refresh token" })
-            const isVerified =  await this.authService.verifyRefreshToken(refreshTokenObj.refresh_token)
+            const isVerified =  await this.userService.verifyRefreshToken(refreshTokenObj.refresh_token)
             
             if (!isVerified) return res.status(403).json({ message: "Invalid refresh token" })
 
             return res.json({
-                accessToken: this.authService.createAccessToken(user as UserDocument),
-                expiresIn: this.authService.getExpiresIn()
+                accessToken: this.userService.createAccessToken(user as UserDocument),
+                expiresIn: this.userService.getExpiresIn()
             })
         } catch (error) {
             res.status(500).json({ error })
         }
+    }
+
+    public getUsers = async (req: Request, res: Response) => {
+        return res.json(await this.userService.all())
     }
 }
