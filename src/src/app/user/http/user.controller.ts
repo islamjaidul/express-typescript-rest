@@ -34,7 +34,7 @@ export default class UserController {
             
             res.json({
                 accessToken: this.userService.createAccessToken(user as UserDocument),
-                refreshToken: this.userService.createRefreshToken(user as UserDocument),
+                refreshToken: await this.userService.createRefreshToken(user as UserDocument),
                 expiresIn: this.userService.getExpiresIn()
             })
         } catch(error) {

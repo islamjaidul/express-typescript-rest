@@ -10,14 +10,17 @@ export default class UserService {
         return jwt.sign(user, accessTokenSecret, { expiresIn: process.env.TOKEN_EXPIRES_IN as string })
     }
 
-    public createRefreshToken(user: UserDocument): string {
+    public async createRefreshToken(user: UserDocument): Promise<string> {
         const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET as string
         const refreshToken = jwt.sign(user, refreshTokenSecret)
-        // @todo: has to be createOrUpdate
-        RefreshToken.create({
-            user_id: user._id,
-            refresh_token: refreshToken
-        })
+        const isRefreshTokenAvailable = await RefreshToken.findOne({user_id: user._id})
+        
+        if (!isRefreshTokenAvailable) {
+            RefreshToken.create({
+                user_id: user._id,
+                refresh_token: refreshToken
+            })
+        }
 
         return refreshToken
     }
@@ -63,7 +66,7 @@ export default class UserService {
             },
         ]
 
-        return Promise.resolve(userDocument)
+        return await User.find({})
     }
 
     public async validatePassword({email, password}: {
