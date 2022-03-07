@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
-    "build": "tsc -p .",
+    "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./dist",
     "test": "mocha -r ts-node/register ./src/__tests__/**/*.test.ts"
   },
   "author": "",
@@ -24,6 +24,7 @@
     "pino": "^7.8.0",
     "pino-pretty": "^7.5.1",
     "reflect-metadata": "^0.1.13",
+    "tscpaths": "^0.0.9",
     "tsyringe": "^4.6.0"
   },
   "devDependencies": {
